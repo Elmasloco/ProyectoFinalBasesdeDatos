@@ -1,0 +1,360 @@
+:root{
+  --blanco: rgb(255, 255, 255);
+  --grisClaro: rgb(228, 228, 228);
+  --azul:rgb(130, 188, 255);
+  --brillo: #dfe2ea;
+  --azulMedio:rgb(69, 72, 253);
+  --azulOscuro:rgb(0, 2, 104);
+  --verdeOscuro:rgb(28, 163, 39);
+  --verdeClaro:rgb(19, 255, 39);
+}
+html{
+    font-size: 62.5%;
+    box-sizing: border-box;
+    background-color: var(--grisClaro);
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+body{
+    font-size: 16px; /*1rem equivaldria a 10px*/
+    font-family: var(--fuente2);
+    margin: 0;
+   padding: 0;
+}
+
+header{
+    font-family: var(--fuente1);
+}
+
+h1{
+    font-size: 4.8rem;
+}
+
+h2{
+    font-size: 3.8rem;
+}
+
+h3{
+    font-size: 2.8rem;
+}
+
+h1,h2,h3{
+    text-align: center;
+}
+
+img{
+    max-width: 100%;
+}
+
+.flex{
+  display: flex;
+}
+
+/*MENU*/
+.headerIndex{
+  background-color: var(--azul);
+  display: flex;
+  flex-direction: row;
+  height: 8.5rem;
+  box-shadow: 0 10px 40px rgba(159, 162, 177, .8);
+}
+.headerLogin{
+  display: flex;
+  flex-direction: row;
+  height: 8.5rem;
+}
+.titulo h1{
+  margin: auto;
+}
+.wrapper{
+  width: min(100%,100%);
+  display: flex;
+  justify-content: end;
+}
+
+.nav {
+  display: inline-flex;
+  position: fixed;
+  overflow: hidden;
+  max-width: 100%;
+  height: 8rem;
+  background-color: var(--blanco);
+  padding: 0 20px;
+  border-radius: 40px;
+  box-shadow: 0 10px 40px rgba(159, 162, 177, .8);
+  z-index: 1;
+}
+
+.nav-item {
+  color: #83818c;
+  padding: 20px;
+  text-decoration: none;
+  transition: .3s;
+  margin: 0 6px;
+  z-index: 1;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  position: relative;
+  
+  &:before {
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background-color: var(--brillo);
+    border-radius: 8px 8px 0 0;
+    opacity: 0;
+    transition: .3s;
+  }
+}
+.nav-item:not(.is-active):hover:before {
+  opacity: 1;
+  bottom: 0;
+}
+
+.nav-item:not(.is-active):hover { color: #333; }
+
+.nav-indicator {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 4px;
+  transition: .4s;
+  height: 5px;
+  z-index: 1;
+  border-radius: 8px 8px 0 0;
+}
+
+@media (max-width: 580px) {
+  .nav { overflow: auto; }
+}
+
+/*MAIN*/
+.hero{
+  background-image: url(img/fondoBiblioteca.jpg);
+  height: 70rem;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+}
+.contenedor_hero{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: var(--blanco);
+  text-align: center;
+}
+.contenedor_hero p {
+  font-size: 3rem;
+}
+
+.contenedor_info{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: min(100%,100%);
+}
+
+@media (min-width:768px) {
+  .contenedor_info{
+    flex-direction: row;
+  }
+}
+
+.info{
+  border: 1rem solid var(--azulMedio);
+  margin: 1rem;
+  border-radius: 5rem;
+}
+
+.info p {
+  text-align: center;
+  font-size:3rem;
+  margin: 2rem;
+}
+
+/*FOOTER*/
+footer{
+  color: var(--brillo);
+  background-color: var(--azulOscuro);
+  height: 10rem;
+  text-align: center;
+}
+
+/*LOGIN*/
+.wrapper2{
+  background:transparent;
+  width: min(100%,100%);
+  display: flex;
+  justify-content: end;
+}
+.bodyLogin{
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-image: url(img/bibliotecaLogin.jpg);
+  background-repeat: none;
+  background-size: cover;
+}
+.bodySignup{
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-image: url(img/bibliotecaSignup.jpg);
+  background-repeat: none;
+  background-size: cover;
+}
+.bodySignupAdmin{
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-image: url(img/signupAdmin.jpg);
+  background-repeat: none;
+  background-size: cover;
+}
+.mainLogin , .mainSignup{
+
+  margin: auto;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+}
+.seccionFormulario{
+  display: inline-block;
+}
+.formularioLogin{
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  background-color: rgba(159, 162, 177, .8);
+  border-radius: 1rem;
+}
+.campo{
+  margin: 3rem;
+  font-size: 2rem;
+}
+.formularioLogin__fieldset , .formularioSignup__fieldset{
+  border: none;
+}
+.formularioSignup{
+  background-color: rgba(159, 162, 177, .8);
+}
+.formularioSignup__legend{
+  margin: auto;
+}
+.contenedor-camposSignup{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3,1fr);
+}
+.campo__label{
+  display: block;
+}
+.campo__field{
+  width: 100%;
+  border: none;
+  padding:1.5rem ;
+  border-radius: 1rem;
+}
+.icon-tabler{
+  display: block;
+  margin: auto;
+}
+.enviar{
+  padding: 1.5rem;
+  border-radius: 2rem;
+  border: 1px solid;
+  background-color: var(--verdeOscuro);
+}
+.enviar:hover{
+  background-color: var(--verdeClaro);
+}
+.alinear-centro{
+  text-align: center;
+}
+
+/*MOSTRAR LIBROS*/
+.bodyMostrarLibros{
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+}
+.tablaLibros{
+  margin: auto ;
+  border: 2px solid #333;
+  margin-top: 2rem;
+  border-radius: 1.5rem;
+  text-align: center;
+}
+.tablaLibros thead {
+  background-color: var(--azul);
+}
+.tablaLibros__columna{
+  padding:1rem;
+}
+.imagenReservar{
+  max-width: 4rem;
+}
+.btnbuscar{
+  max-width: 3rem;
+  
+}
+
+.buscarLibro{
+  flex-direction: row;
+
+}
+.campo__select{
+  padding: 0;
+}
+.contBoton{
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+.contenedor__busqueda_filtro{
+  justify-content: space-between ;
+}
+.filtroGenero{
+  justify-content: center;
+  align-items: center;
+}
+.botonRegresar a{
+  text-decoration: none;
+  color: black;
+  margin: auto;
+}
+.contBotonRegresar{
+  margin: auto;
+  justify-content: center;
+  align-items: center;
+}
+.botonRegresar{
+  text-decoration: none;
+  border-color: black;
+  padding: 1.5rem;
+  border-radius: 2rem;
+  border: 1px solid;
+  background-color: var(--verdeOscuro);
+  text-align: center;
+  max-width: 15rem;
+  margin-top: 2rem;
+}
+.botonRegresar:hover{
+  background-color: var(--verdeClaro);
+  cursor: pointer;
+}
+
+
+
