@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3307
--- Tiempo de generación: 10-11-2023 a las 04:53:38
+-- Tiempo de generación: 13-11-2023 a las 16:36:14
 -- Versión del servidor: 10.4.28-MariaDB
--- Versión de PHP: 8.2.4
+-- Versión de PHP: 8.0.28
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -34,17 +34,19 @@ CREATE TABLE `libro` (
   `isbn` varchar(255) NOT NULL,
   `genero` varchar(30) NOT NULL,
   `fecha_publicacion` date NOT NULL,
-  `ejemplares` int(11) NOT NULL,
-  `seccion_id` int(11) NOT NULL
+  `seccion_id` int(11) NOT NULL,
+  `ejemplares` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `libro`
 --
 
-INSERT INTO `libro` (`id`, `titulo`, `autor`, `isbn`, `genero`, `fecha_publicacion`, `ejemplares`, `seccion_id`) VALUES
-(1, 'Cien años de soledad', 'Gabriel Garcia Marquez', '12585874', 'Romance', '1960-09-30', 10, 3),
-(3, 'Doce cuentos peregrinos', 'Gabriel Garcia Marquez', '569201478', 'Ficcion', '1992-05-17', 3, 1);
+INSERT INTO `libro` (`id`, `titulo`, `autor`, `isbn`, `genero`, `fecha_publicacion`, `seccion_id`, `ejemplares`) VALUES
+(1, 'Cien años de soledad', 'Gabriel Garcia Marquez', '12585874', 'Romance', '1960-09-30', 3, 6),
+(3, 'Doce cuentos peregrinos', 'Gabriel Garcia Marquez', '569201478', 'Ficcion', '1992-05-17', 1, 2),
+(4, 'La costra', 'Samuelito', '12341234', 'Comedia', '2011-12-14', 4, 10),
+(5, 'Mis cosas', 'Daniel El travieso', '1222331', 'Misterio', '2010-10-04', 8, 10);
 
 -- --------------------------------------------------------
 
@@ -67,7 +69,7 @@ CREATE TABLE `persona` (
 --
 
 INSERT INTO `persona` (`id`, `nombre`, `apellido`, `direccion`, `telefono`, `correo`, `contraseña`) VALUES
-(1, 'Samuel', 'Arciniegas', 'null', 'null', 'slarci@gmail.com', '8s4d84a'),
+(1, 'Samuel', 'Arciniegas', 'null', 'null', 'slarci@gmail.com', 'null'),
 (2, 'Nicolas', 'Tarazona', 'null', 'null', 'nico.tarazona@gmail.com', 'n123*/t'),
 (3, 'Daniel', 'Tarazona', 'null', 'null', 'dani.tarazona@gmail.com', 'dan!%$909'),
 (4, 'Jorge', 'Tarazona', 'null', 'null', 'je.tarazona@gmail.com', 'sobelo!'),
@@ -77,11 +79,12 @@ INSERT INTO `persona` (`id`, `nombre`, `apellido`, `direccion`, `telefono`, `cor
 (8, 'Pablo', 'Reyes', 'null', 'null', 'pablito@gmail.com', '6ad4a'),
 (9, 'Laura', 'Muñoz', 'null', 'null', 'laurita@gmail.com', '8f6af'),
 (10, 'Santiago', 'Muñoz', 'Calle 123', '2586574104', 'santi@gmail.com', 'null'),
-(11, 'Michelle', 'Ramirez', 'Calle 79', '981819', 'michiram@gmail.com', 'null'),
-(12, 'Felipe', 'Pardo', 'Calle 79 b#123', '1222331', 'pipepa@gmail.com', 'null'),
-(13, 'Natasha', 'Gonzales', 'Calle 79 b#123', '1222331', 'natashina@gmail.com', 'null'),
-(14, 'Andres', 'Diaz', 'calle 88 este 1', '12221', 'buenosdiaz@gmail.com', 'null'),
-(15, 'Ximena', 'Acosta', '', 'null', 'null', 'laprofe@gmail.com');
+(11, 'Patricio', 'Estrella', '', 'null', 'null', 'pato@yopmail.com'),
+(12, 'Bob', 'Esponja', 'null', 'null', '111', 'laesponja@yopmail.com'),
+(13, 'Don', 'Cangrejo', 'null', 'null', '111', 'cangreburguer@yopmail.com'),
+(14, 'Pato', 'Donald', 'null', 'null', '111', 'cuak@yopmail.com'),
+(15, 'Mickey', 'Mouse', 'null', 'null', 'aja@yopmail.com', '111'),
+(16, 'La vaca', 'Lola', 'Por ahi #123', '124522', 'lavacamuu@yopmail.com', 'null');
 
 -- --------------------------------------------------------
 
@@ -93,18 +96,36 @@ CREATE TABLE `prestamo` (
   `id` int(11) NOT NULL,
   `fecha_prestamo` date NOT NULL,
   `fecha_devolucion` date NOT NULL,
-  `estado` varchar(15) DEFAULT NULL,
   `libro_id` int(11) NOT NULL,
-  `persona_id` int(11) NOT NULL
+  `persona_id` int(11) NOT NULL,
+  `devuelto` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `prestamo`
 --
 
-INSERT INTO `prestamo` (`id`, `fecha_prestamo`, `fecha_devolucion`, `estado`, `libro_id`, `persona_id`) VALUES
-(2, '2023-10-04', '2023-10-30', 'Bueno', 3, 1),
-(3, '2023-10-04', '2023-11-10', 'bueno', 1, 10);
+INSERT INTO `prestamo` (`id`, `fecha_prestamo`, `fecha_devolucion`, `libro_id`, `persona_id`, `devuelto`) VALUES
+(2, '2023-10-04', '2023-10-30', 3, 1, 0),
+(4, '2023-11-12', '2024-02-03', 1, 1, 1),
+(5, '0000-00-00', '0000-00-00', 3, 10, 1),
+(6, '2023-11-08', '2023-11-10', 1, 10, 1),
+(7, '2023-11-12', '2023-12-12', 3, 10, 1),
+(8, '2023-11-12', '2023-12-12', 3, 10, 1),
+(9, '2023-11-12', '2023-12-12', 1, 10, 1),
+(19, '2023-11-12', '2023-12-12', 1, 1, 0),
+(20, '2023-11-12', '2023-12-12', 1, 1, 0),
+(21, '2023-11-12', '2023-12-12', 1, 10, 1),
+(22, '2023-11-12', '2023-12-12', 1, 10, 1),
+(23, '2023-11-12', '2023-12-12', 1, 10, 0),
+(24, '2023-11-12', '2023-12-12', 3, 10, 1),
+(25, '2023-11-12', '2023-12-12', 3, 10, 1),
+(26, '2023-11-12', '2023-12-12', 1, 10, 1),
+(27, '2023-11-12', '2023-12-12', 3, 10, 0),
+(28, '2023-11-12', '2023-12-12', 1, 10, 0),
+(29, '2023-11-12', '2023-12-12', 3, 10, 0),
+(30, '2023-11-12', '2023-12-12', 1, 10, 0),
+(31, '2023-11-12', '2023-12-12', 4, 10, 1);
 
 -- --------------------------------------------------------
 
@@ -126,11 +147,12 @@ INSERT INTO `roles` (`id`, `rol`, `id_persona`) VALUES
 (2, 'Administrador', 8),
 (3, 'Administrador', 9),
 (4, 'Usuario', 10),
-(5, 'Usuario', 11),
-(6, 'Usuario', 12),
-(7, 'Usuario', 13),
-(8, 'Usuario', 14),
-(9, 'Administrador', 15);
+(5, 'Administrador', 11),
+(6, 'Administrador', 12),
+(7, 'Administrador', 13),
+(8, 'Administrador', 14),
+(9, 'Administrador', 15),
+(10, 'Usuario', 16);
 
 -- --------------------------------------------------------
 
@@ -205,25 +227,25 @@ ALTER TABLE `seccion`
 -- AUTO_INCREMENT de la tabla `libro`
 --
 ALTER TABLE `libro`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `persona`
 --
 ALTER TABLE `persona`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de la tabla `prestamo`
 --
 ALTER TABLE `prestamo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT de la tabla `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de la tabla `seccion`

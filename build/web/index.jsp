@@ -7,10 +7,6 @@
 <%@ page import="ConexionSQL.ConexionSQL" %>
 <!DOCTYPE html>
 <html lang="en">
-<% 
-ConexionSQL c = new ConexionSQL();
-System.out.println(c.abrirConexion());
-%>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

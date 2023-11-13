@@ -1,9 +1,0 @@
-Anotaciones
-Falta:
-1. Hacer todo el proceso de filtrado de libros de la pagina de mostrarLibros.jsp
-2. Mostrar Libros reservados en el home.jsp para todos los usuarios 
-3. Hacer proceso de devolucion de libros (solo para los usuarios)
-4. Hacer proceso de pedir en prestamo los libros (usuarios)
-5. Añadir al admin la opcion de añadir libros
-6. El usuario debe poder modificar sus datos
-7. Mostrar todos los usuarios (opcion solo para admin)

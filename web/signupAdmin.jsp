@@ -51,7 +51,7 @@
                         </div>                         
                         <div class="campo">
                             <label class="campo__label" for="contraseña">Contraseña</label>
-                            <input class="campo__field" type="password" placeholder="Tu futura contraseña" id="contraseña" name="contraseña">
+                            <input class="campo__field" type="password" placeholder="Tu futura contraseña" id="contraseña" name="contra">
                         </div> 
                     </div>
                     <div class="flex alinear-centro">

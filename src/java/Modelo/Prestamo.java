@@ -11,21 +11,32 @@ import java.util.HashMap;
  * @author samue
  */
 public class Prestamo {
-    
+
     private int id_prestamo;
     private String fecha_prestamo;
     private String fecha_devolucion;
-    private String estado;
     private int libro_id;
     private int persona_id;
+    private boolean devuelto;
+    private String tituloLibro;
 
-    public Prestamo(int id_prestamo, String fecha_prestamo, String fecha_devolucion, String estado, int libro_id, int persona_id) {
+    public Prestamo(int id_prestamo, String fecha_prestamo, String fecha_devolucion, int libro_id, int persona_id, boolean devolver) {
         this.id_prestamo = id_prestamo;
         this.fecha_prestamo = fecha_prestamo;
         this.fecha_devolucion = fecha_devolucion;
-        this.estado = estado;
         this.libro_id = libro_id;
         this.persona_id = persona_id;
+        this.devuelto = devolver;
+    }
+
+    public Prestamo(int id_prestamo, String fecha_prestamo, String fecha_devolucion, int libro_id, int persona_id, boolean devuelto, String tituloLibro) {
+        this.id_prestamo = id_prestamo;
+        this.fecha_prestamo = fecha_prestamo;
+        this.fecha_devolucion = fecha_devolucion;
+        this.libro_id = libro_id;
+        this.persona_id = persona_id;
+        this.devuelto = devuelto;
+        this.tituloLibro = tituloLibro;
     }
 
     public int getId_prestamo() {
@@ -52,14 +63,6 @@ public class Prestamo {
         this.fecha_devolucion = fecha_devolucion;
     }
 
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
-
     public int getLibro_id() {
         return libro_id;
     }
@@ -75,17 +78,33 @@ public class Prestamo {
     public void setPersona_id(int persona_id) {
         this.persona_id = persona_id;
     }
-    
-    public HashMap toHashMap(){
+
+    public boolean isDevuelto() {
+        return devuelto;
+    }
+
+    public void setDevuelto(boolean devuelto) {
+        this.devuelto = devuelto;
+    }
+
+    public String getTituloLibro() {
+        return tituloLibro;
+    }
+
+    public void setTituloLibro(String tituloLibro) {
+        this.tituloLibro = tituloLibro;
+    }
+
+    public HashMap toHashMap() {
         HashMap prestamo = new HashMap();
         prestamo.put("id", this.id_prestamo);
         prestamo.put("fecha_prestamo", this.fecha_prestamo);
         prestamo.put("fecha_devolucion", this.fecha_devolucion);
-        prestamo.put("estado", this.estado);
         prestamo.put("libro_id", this.libro_id);
         prestamo.put("persona_id", this.persona_id);
+        prestamo.put("devolver", this.devuelto);
+        prestamo.put("titulo", this.tituloLibro);
         return prestamo;
     }
-    
-    
+
 }

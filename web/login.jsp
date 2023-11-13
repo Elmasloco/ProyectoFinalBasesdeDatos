@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<% boolean admin = false; %>
 <!DOCTYPE html>
 <html lang="en" class="htmlLogin">
     <head>
@@ -9,6 +10,24 @@
         <link rel="stylesheet" href="estiloPrin.css">
         <link rel="preload" href="estiloPrin.css" as="style">
         <title>BIBLIOTECA</title>
+        <script>
+            window.onload = function(){
+                mostrarCampoAdmin();
+            }
+            function mostrarCampoAdmin() {
+                const rolSelect = document.getElementById("rol");
+                const contrasenaCampo = document.getElementById("campo-contraseña");
+                const inputContraseña = document.getElementById("contra");
+                if (rolSelect.value === "admin") {
+                    contrasenaCampo.style.display = "block";
+                    inputContraseña.required = true;
+                } else {
+                    contrasenaCampo.style.display = "none";
+                    inputContraseña.required = false;
+                }
+
+            }
+        </script>
     </head>
     <body class="bodyLogin">
         <header class="headerLogin">
@@ -37,7 +56,7 @@
                         <div class="contenedor-campos">
                             <div class="campo">
                                 <label class="campo__label" for="rol">Rol</label>
-                                <select name="rol" id="rol" class="campo__field">
+                                <select name="rol" id="rol" class="campo__field" onchange="mostrarCampoAdmin()">
                                     <option value="seleccioneRol">Selecciones su rol</option>
                                     <option value="admin">Administrador</option>
                                     <option value="user">Usuario</option>
@@ -45,7 +64,7 @@
                             </div>
                             <div class="campo">
                                 <label class="campo__label" for="correo">Correo</label>
-                                <input class="campo__field" type="mail" placeholder="alguien@algo.com" id="correo" name="correo">
+                                <input class="campo__field" type="mail" placeholder="alguien@algo.com" id="correo" name="correo" required>
                             </div>
 
                             <div class="campo" id="campo-contraseña">
@@ -61,6 +80,5 @@
             </section>
         </main>
         <script src="menu.js"></script> 
-        <script src="login.js"></script>
     </body>
 </html>

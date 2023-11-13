@@ -1,12 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="Modelo.User" %>
-<%@ page import="Modelo.Admin" %>
+<%@ page import="Modelo.*" %>
 <%@ page import="Controlador.PersonaDAO" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.HashMap" %>
-<jsp:include page="/Controlador?accion=resultado"/>
+<jsp:include page="/Controlador?accion=libros"/>
 <%
     String rol = (String) request.getSession().getAttribute("rol");
+    Persona persona = (Persona) request.getSession().getAttribute("userLogin");
     Admin admin = null;
     User user = null;
     
@@ -40,6 +40,10 @@
                 <nav class="nav">
                     <a href="home.jsp" class="nav-item " active-color="orange">Home</a>
                     <a href="mostrarLibros.jsp" class="nav-item is-active" active-color="green">Catalogo de libros</a>
+                    <% if ("admin".equals(rol)) { %>
+                    <a href="signupAdmin.jsp" class="nav-item is-active" active-color="blue">Sign Up</a>
+                    <a href="signupAdmin.jsp" class="nav-item is-active" active-color="black">Ver usuarios</a>
+                    <% } %>
                     <a href="index.jsp" class="nav-item" active-color="red">Cerrar sesion</a>
                     <span class="nav-indicator"></span>
                 </nav>
@@ -48,21 +52,15 @@
         <h1>CATALOGO DE LIBROS</h1>
         <main>
             <div class="contenedor__busqueda_filtro flex">
-                <form action="Controlador" method="get" class="filtroBusquedaLibro flex">
+                <form action="Controlador" method="post" class="filtroBusquedaLibro flex">
                     <div class="campo">
-                        <select name="filtro" id="filtro" class="campo__select">
+                        <select name="filtro" id="filtro" class="campo__select" required>
                             <option value="todos">Todos</option>
                             <option value="genero">Filtrar por Género</option>
                             <option value="autor">Buscar por Autor</option>
-                            <option value="nombre">Buscar por Nombre</option>
+                            <option value="nombre">Buscar por Titulo</option>
                         </select>
-                    </div>
-                    <div class="cont__buscar">
-                        <div class="campo campo__contenedorBusqueda">
-                            <input type="text" required name="info" class="campo__busqueda">
-                        </div>
-                    </div>
-                    <div class="contBoton flex">
+                        <input name="buscador" placeholder="Ingrese un valor" />
                         <button type="submit" class="btnbuscar" name="accion" value="buscarLibro">
                             <img src="img/buscar.png" alt="Buscar">
                         </button>
@@ -80,14 +78,20 @@
                             <th scope="col" class="tablaLibros__columna">ISBN</th>
                             <th scope="col" class="tablaLibros__columna">fecha de publicacion</th>
                             <th scope="col" class="tablaLibros__columna">ejemplares</th>
+                            <% if (!"admin".equals(rol)){ %>
                             <th class="tablaLibros__columna" class="thOpcion">Reservar</th>
+                            <% } %>
                         </tr>
                     </thead>
                     <tbody>
                         <%
                               PersonaDAO pdao = new PersonaDAO();
                               ArrayList<HashMap> resultado = (ArrayList<HashMap>) request.getAttribute("resultado");
-                              resultado = pdao.mostrarLibros();
+                              System.out.println("RESULTADO FILTRO: "+resultado);
+                              if(resultado == null) {
+                                resultado = pdao.mostrarLibros();
+                                System.out.println("RESULTADO TODOS: "+resultado);
+                              }
                               if(resultado == null) {
                                   out.print("<tr><td colspan='8'>No se encontraron resultados</td></tr>");
                               } else {
@@ -96,15 +100,21 @@
                                     out.print("<td scope='row'>"+resultados.get("id")+"</td>");
                                     out.print("<td>"+resultados.get("titulo")+"</td>");           
                                     out.print("<td>"+resultados.get("autor")+"</td>");
-                                    out.print("<td>"+resultados.get("isbn")+"</td>");
                                     out.print("<td>"+resultados.get("genero")+"</td>");
+                                    out.print("<td>"+resultados.get("isbn")+"</td>");
                                     out.print("<td>"+resultados.get("fecha_publicacion")+"</td>");
                                     out.print("<td>"+resultados.get("ejemplares")+"</td>");
+                                    if (!"admin".equals(rol)) {
                                     out.print("<td>"
-                                    + "<form action='' method='POST' class='formReservar'>"
-                                    + "<input title='Reservar' class='imagenReservar' alt='Completar' src='img/alquilarLibro.png' type='image'/>"
-                                    +        "</form>"+
-                                             "</td>");
+                                        + "<form action='Controlador' method='POST' class='formReservar'>"
+                                        + "<input hidden name='libroId' value='"+resultados.get("id")+"'/>"
+                                        + "<input hidden name='personaId' value='"+persona.getId()+"'/>"
+                                        + "<input hidden name='correo' value='"+persona.getCorreo()+"'/>"
+                                        + "<input hidden name='rol' value='"+rol+"'/>"
+                                        + "<button class='btn-reservar' name='accion' value='reservar'><img alt='Reservar' src='img/alquilarLibro.png' height='30px' width='30px'/></button>"
+                                        + "</form>"
+                                    + "</td>");
+                                    }
                                     out.print("</tr>");
                                 }
                              }

@@ -17,28 +17,26 @@ import java.util.HashMap;
 public class PersonaDAO {
 
     public ConexionSQL con = new ConexionSQL();
-    public Connection cn = con.abrirConexion();
-    private PreparedStatement ps;
-    private ResultSet rs;
-    private String consultaSQL = "";
 
     public PersonaDAO() {
     }
 
     public void insertarUsuario(User user) {
-        consultaSQL = "INSERT INTO biblioteca.persona(nombre, apellido, direccion, telefono, correo, contraseña) VALUES(?,?,?,?,?,?)";
+        String SQLString = "INSERT INTO biblioteca.persona(nombre, apellido, direccion, telefono, correo, contraseña) VALUES(?,?,?,?,?,?)";
+        PreparedStatement ps;
         try {
-            ps = cn.prepareStatement(consultaSQL, Statement.RETURN_GENERATED_KEYS);
+            Connection cn = con.abrirConexion();
+            ps = cn.prepareStatement(SQLString, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, user.getNombre());
             ps.setString(2, user.getApellido());
             ps.setString(3, user.getDireccion());
             ps.setString(4, user.getTelefono());
             ps.setString(5, user.getCorreo());
-            ps.setString(6, "null");
+            ps.setString(6, "...");
             int registrosAfectados = ps.executeUpdate();
             if (registrosAfectados == 1) {
                 System.out.println("Usuario insertado correctamente!");
-                rs = ps.getGeneratedKeys();
+                ResultSet rs = ps.getGeneratedKeys();
                 if (rs.next()) {
                     int id = rs.getInt(1);
                     user.setId(id);
@@ -56,19 +54,21 @@ public class PersonaDAO {
     }
 
     public void insertarAdmin(Admin admin) {
-        consultaSQL = "INSERT INTO biblioteca.persona(nombre, apellido, direccion, telefono, correo, contraseña) VALUES(?,?,?,?,?,?)";
+        String SQLString = "INSERT INTO biblioteca.persona(nombre, apellido, direccion, telefono, correo, contraseña) VALUES(?,?,?,?,?,?)";
+        PreparedStatement ps;
         try {
-            ps = cn.prepareStatement(consultaSQL, Statement.RETURN_GENERATED_KEYS);
+            Connection cn = con.abrirConexion();
+            ps = cn.prepareStatement(SQLString, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, admin.getNombre());
             ps.setString(2, admin.getApellido());
-            ps.setString(3, admin.getDireccion());
-            ps.setString(4, "null");
-            ps.setString(5, "null");
+            ps.setString(3, "...");
+            ps.setString(4, "...");
+            ps.setString(5, admin.getCorreo());
             ps.setString(6, admin.getContraseña());
             int registrosAfectados = ps.executeUpdate();
             if (registrosAfectados == 1) {
                 System.out.println("Administrador insertado correctamente!");
-                rs = ps.getGeneratedKeys();
+                ResultSet rs = ps.getGeneratedKeys();
                 if (rs.next()) {
                     int id = rs.getInt(1);
                     admin.setId(id);
@@ -86,25 +86,25 @@ public class PersonaDAO {
     }
 
     public void insertarLibro(Libro libro) {
-        consultaSQL = "INSERT INTO biblioteca.libro(titulo, autor, isbn, genero, fecha_publicacion, ejemplares, seccion_id) VALUES(?,?,?,?,?,?,?)";
+        String SQLString = "INSERT INTO biblioteca.libro(titulo, autor, isbn, genero, fecha_publicacion, seccion_id, ejemplares) VALUES(?,?,?,?,?,?,?)";
+        PreparedStatement ps;
         try {
-            ps = cn.prepareStatement(consultaSQL, Statement.RETURN_GENERATED_KEYS);
+            Connection cn = con.abrirConexion();
+            ps = cn.prepareStatement(SQLString, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, libro.getTitulo());
             ps.setString(2, libro.getAutor());
             ps.setString(3, libro.getIsbn());
             ps.setString(4, libro.getGenero());
             ps.setString(5, libro.getFecha_publicacion());
-            ps.setInt(6, libro.getEjemplares());
-            ps.setInt(7, libro.getSeccion_id());
+            ps.setInt(6, libro.getSeccion_id());
+            ps.setInt(7, libro.getEjemplares());
             int registrosAfectados = ps.executeUpdate();
             if (registrosAfectados == 1) {
                 System.out.println("Libro insertado correctamente!");
-                rs = ps.getGeneratedKeys();
+                ResultSet rs = ps.getGeneratedKeys();
                 if (rs.next()) {
                     int id = rs.getInt(1);
                     libro.setIdLibro(id);
-                } else {
-                    System.out.println("Error al crear el libro");
                 }
             } else {
                 System.out.println("Error al insertar libro");
@@ -115,21 +115,35 @@ public class PersonaDAO {
         }
     }
 
-    public void agregarPrestamo(int idUsuario, int idLibro, String fechaP, String fechaD, String estado) {
-        consultaSQL = "INSERT INTO biblioteca.prestamo(fecha_prestamo, fecha_devolucion, estado, libro_id, persona_id) VALUES(?,?,?,?,?)";
+    private void actualizarEjemplares(int idLibro) throws SQLException {
+        String SQLString = "UPDATE libro SET ejemplares = ejemplares - 1 WHERE id = ?";
+        Connection cn = con.abrirConexion();
+        PreparedStatement ps = cn.prepareStatement(SQLString);
+        ps.setInt(1, idLibro);
+        ps.executeUpdate();
+        con.cerrarConexion();
+    }
+
+    private void crearPrestamo(int idUsuario, int idLibro, String fechaP, String fechaD) throws SQLException {
+        String SQLString = "INSERT INTO biblioteca.prestamo(fecha_prestamo, fecha_devolucion, libro_id, persona_id) VALUES(?,?,?,?)";
+        PreparedStatement ps;
+
+        Connection cn = con.abrirConexion();
+        ps = cn.prepareStatement(SQLString, Statement.RETURN_GENERATED_KEYS);
+        ps.setString(1, fechaP);
+        ps.setString(2, fechaD);
+        ps.setInt(3, idLibro);
+        ps.setInt(4, idUsuario);
+        ps.executeUpdate();
+
+        con.cerrarConexion();
+
+    }
+
+    public void agregarPrestamo(int idUsuario, int idLibro, String fechaP, String fechaD) {
         try {
-            ps = cn.prepareStatement(consultaSQL, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, fechaP);
-            ps.setString(2, fechaD);
-            ps.setString(3, estado);
-            ps.setInt(4, idLibro);
-            ps.setInt(5, idUsuario);
-            int registrosAfectados = ps.executeUpdate();
-            if (registrosAfectados == 1) {
-                System.out.println("Prestamo agredado correctamente!");
-            } else {
-                System.out.println("Error al agregar prestamo");
-            }
+            crearPrestamo(idUsuario, idLibro, fechaP, fechaD);
+            actualizarEjemplares(idLibro);
             con.cerrarConexion();
         } catch (SQLException e) {
             System.out.println("Error al agregar prestamo: " + e);
@@ -137,9 +151,11 @@ public class PersonaDAO {
     }
 
     private void insertarRol(String rol, int id) {
-        consultaSQL = "INSERT INTO biblioteca.roles(rol, id_persona) VALUES(?,?)";
+        String SQLString = "INSERT INTO biblioteca.roles(rol, id_persona) VALUES(?,?)";
+        PreparedStatement ps;
         try {
-            ps = cn.prepareStatement(consultaSQL);
+            Connection cn = con.abrirConexion();
+            ps = cn.prepareStatement(SQLString);
             ps.setString(1, rol);
             ps.setInt(2, id);
             int registrosAfectados = ps.executeUpdate();
@@ -154,76 +170,34 @@ public class PersonaDAO {
         }
     }
 
-    public void eliminarPrestamo(int id){
-        consultaSQL = "DELETE FROM biblioteca.prestamo WHERE id = ?";
-        try{
-            ps = cn.prepareStatement(consultaSQL);
-            ps.setInt(1, id);
-            int registroEliminado = ps.executeUpdate();
-            if(registroEliminado == 1){
-                System.out.println("Prestamo: "+id+" eliminado correctamente");
-            }else{
-                System.out.println("Error al eliminar prestamo: "+id);
-            }
-        con.cerrarConexion();
-        }catch(SQLException e){
-            System.out.println("Error al eliminar prestamo: "+e);
-        }   
-    }
-  
-    public void modificarPersona(int idPersona, Persona persona){
-        consultaSQL = "UPDATE biblioteca.persona SET nombre=?, apellido=?, direccion=?, telefono=?, correo=?, contraseña=? WHERE id=?";
-        try{
-            ps = cn.prepareStatement(consultaSQL);
-            ps.setString(1, persona.getNombre());
-            ps.setString(2, persona.getApellido());
-            ps.setString(3, persona.getDireccion());
-            ps.setString(4, persona.getTelefono());
-            ps.setString(5, persona.getCorreo());
-            if(persona instanceof Admin){
-                ps.setString(6, ((Admin)persona).getContraseña());
-            }else{
-                ps.setString(6, "null");
-            }
-            ps.setInt(7, idPersona);
-            int registroModificado = ps.executeUpdate();
-            if(registroModificado == 1){
-                System.out.println("Persona: "+idPersona+" ha sido modificado");
-            }else{
-                System.out.println("Error al modificar registro: "+idPersona);
-            }
-        con.cerrarConexion();
-        }catch(SQLException e){
-            System.out.println("Error al modificar datos del registro: "+e);
-        }
-    }
-    
     public ArrayList<HashMap> mostrarLibros() {
-        consultaSQL = "SELECT * FROM biblioteca.libro";
+        String SQLString = "SELECT * FROM libro WHERE ejemplares > 0";
+        PreparedStatement ps;
         ArrayList<HashMap> resultado = new ArrayList<>();
-        try{
-            ps = cn.prepareStatement(consultaSQL);
-            rs = ps.executeQuery();
-            while(rs.next()){
+        try {
+            Connection cn = con.abrirConexion();
+            ps = cn.prepareStatement(SQLString);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
                 int idLibro = rs.getInt("id");
                 String tituloLibro = rs.getString("titulo");
                 String autorLibro = rs.getString("autor");
                 String isbnLibro = rs.getString("isbn");
                 String generoLibro = rs.getString("genero");
                 String fechaLibro = rs.getString("fecha_publicacion");
-                int ejemplaresLibro = rs.getInt("ejemplares");
                 int seccionLibro = rs.getInt("seccion_id");
-                Libro libro = new Libro(tituloLibro, autorLibro, isbnLibro, generoLibro, fechaLibro, ejemplaresLibro, seccionLibro);
+                int ejemplares = rs.getInt("ejemplares");
+                Libro libro = new Libro(tituloLibro, autorLibro, isbnLibro, generoLibro, fechaLibro, seccionLibro, ejemplares);
                 libro.setIdLibro(idLibro);
                 resultado.add(libro.toHashMap());
             }
-        con.cerrarConexion();
-        }catch(SQLException e){
-            System.out.println("Error al leer registros de tabla libro: "+e);
+            con.cerrarConexion();
+        } catch (SQLException e) {
+            System.out.println("Error al leer registros de tabla libro: " + e);
         }
         return resultado;
     }
-    
+
     /*Forma de devolver el resultado de los libros en el metodo mostrarLibros():
         ArrayList<HashMap> librosAlmacenados = pdao.mostrarLibros();
             for (HashMap libroMostrado : librosAlmacenados) {
@@ -237,38 +211,39 @@ public class PersonaDAO {
                         + "Seccion: " + libroMostrado.get("seccion_id") + "\n");
             }
      */
-
     public ArrayList<HashMap> mostrarPersonas() {
-        consultaSQL = "SELECT * FROM biblioteca.persona";
+        String SQLString = "SELECT * FROM biblioteca.persona";
+        PreparedStatement ps;
         ArrayList<HashMap> resultado = new ArrayList<>();
-        try{
-            ps = cn.prepareStatement(consultaSQL);
-            rs = ps.executeQuery();
-            while(rs.next()){
+        try {
+            Connection cn = con.abrirConexion();
+            ps = cn.prepareStatement(SQLString);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
                 int idPersona = rs.getInt("id");
                 String nombrePersona = rs.getString("nombre");
                 String apellidoPersona = rs.getString("apellido");
                 String direccionPersona = rs.getString("direccion");
                 String telefonoPersona = rs.getString("telefono");
-                String correoPersona= rs.getString("correo");
+                String correoPersona = rs.getString("correo");
                 String contrasenaPersona = rs.getString("contraseña");
-                if(contrasenaPersona != null && !contrasenaPersona.isEmpty()){
+                if (contrasenaPersona != null && !contrasenaPersona.isEmpty()) {
                     Admin admin = new Admin(nombrePersona, apellidoPersona, direccionPersona, telefonoPersona, correoPersona, contrasenaPersona);
                     admin.setId(idPersona);
                     resultado.add(admin.toHashMap());
-                }else{
+                } else {
                     User user = new User(nombrePersona, apellidoPersona, direccionPersona, telefonoPersona, correoPersona);
                     user.setId(idPersona);
                     resultado.add(user.toHashMap());
                 }
             }
-        con.cerrarConexion();
-        }catch(SQLException e){
-            System.out.println("Error al leer registros de tabla persona: "+e);
+            con.cerrarConexion();
+        } catch (SQLException e) {
+            System.out.println("Error al leer registros de tabla persona: " + e);
         }
         return resultado;
     }
-    
+
     /*Forma de devolver el resultado de los libros en el metodo mostrarPersonas():
         ArrayList<HashMap> personasAlmacenadas = pdao.mostrarPersonas();
             for (HashMap personas : personasAlmacenadas) {
@@ -281,53 +256,59 @@ public class PersonaDAO {
                         + "Contraseña: " + personas.get("contraseña") + "\n");
             }
      */
-    
-    public ArrayList<HashMap> mostrarPrestamos(int idUsuario) {
-        consultaSQL = "SELECT * FROM biblioteca.prestamo WHERE id="+idUsuario;
+    public ArrayList<HashMap> mostrarPrestamos(int personaId) {
+        String SQLString = "SELECT P.*, L.titulo FROM `prestamo` P, libro L WHERE P.libro_id = L.id AND devuelto = false AND persona_id = ? ORDER BY P.id";
+        PreparedStatement ps;
         ArrayList<HashMap> resultado = new ArrayList<>();
-        try{
-            ps = cn.prepareStatement(consultaSQL);
-            rs = ps.executeQuery();
-            while(rs.next()){
+        try {
+            Connection cn = con.abrirConexion();
+            ps = cn.prepareStatement(SQLString);
+            ps.setInt(1, personaId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
                 int idPrestamo = rs.getInt("id");
                 String fechaPrestamo = rs.getString("fecha_prestamo");
                 String fechaDevolucion = rs.getString("fecha_devolucion");
-                String estado = rs.getString("estado");
-                int libroID= rs.getInt("libro_id");
-                int personaID= rs.getInt("persona_id");
-                Prestamo prestamo = new Prestamo(idPrestamo, fechaPrestamo, fechaDevolucion, estado, libroID, personaID);
+                int libroID = rs.getInt("libro_id");
+                int personaID = rs.getInt("persona_id");
+                boolean devolver = rs.getBoolean("devuelto");
+                String titulo = rs.getString("titulo");
+                Prestamo prestamo = new Prestamo(idPrestamo, fechaPrestamo, fechaDevolucion, libroID, personaID, devolver, titulo);
                 resultado.add(prestamo.toHashMap());
             }
-        con.cerrarConexion();
-        }catch(SQLException e){
-            System.out.println("Error al leer registros de tabla persona: "+e);
+            con.cerrarConexion();
+        } catch (SQLException e) {
+            System.out.println("Error al leer registros de tabla persona: " + e);
         }
         return resultado;
     }
-    
+
     public ArrayList<HashMap> mostrarPrestamosAdmin() {
-        consultaSQL = "SELECT * FROM biblioteca.prestamo";
+        String SQLString = "SELECT P.*, L.titulo FROM prestamo P, libro L WHERE P.libro_id = L.id ORDER BY P.id";
+        PreparedStatement ps;
         ArrayList<HashMap> resultado = new ArrayList<>();
-        try{
-            ps = cn.prepareStatement(consultaSQL);
-            rs = ps.executeQuery();
-            while(rs.next()){
+        try {
+            Connection cn = con.abrirConexion();
+            ps = cn.prepareStatement(SQLString);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
                 int idPrestamo = rs.getInt("id");
                 String fechaPrestamo = rs.getString("fecha_prestamo");
                 String fechaDevolucion = rs.getString("fecha_devolucion");
-                String estado = rs.getString("estado");
-                int libroID= rs.getInt("libro_id");
-                int personaID= rs.getInt("persona_id");
-                Prestamo prestamo = new Prestamo(idPrestamo, fechaPrestamo, fechaDevolucion, estado, libroID, personaID);
+                int libroID = rs.getInt("libro_id");
+                int personaID = rs.getInt("persona_id");
+                boolean devolver = rs.getBoolean("devuelto");
+                String titulo = rs.getString("titulo");
+                Prestamo prestamo = new Prestamo(idPrestamo, fechaPrestamo, fechaDevolucion, libroID, personaID, devolver, titulo);
                 resultado.add(prestamo.toHashMap());
             }
-        con.cerrarConexion();
-        }catch(SQLException e){
-            System.out.println("Error al leer registros de tabla persona: "+e);
+            con.cerrarConexion();
+        } catch (SQLException e) {
+            System.out.println("Error al leer registros de tabla persona: " + e);
         }
         return resultado;
     }
-    
+
     /*Forma de devolver el resultado de los libros en el metodo mostrarPrestamos():
         ArrayList<HashMap> personasAlmacenadas = pdao.mostrarPrestamos();
             for (HashMap personas : personasAlmacenadas) {
@@ -339,16 +320,30 @@ public class PersonaDAO {
                         + "Persona id: " + personas.get("persona_id") + "\n");
             }
      */
-    
+    public ArrayList<HashMap> mostrarLibrosBuscados(String filtro, String buscador) {
+        switch (filtro) {
+            case "nombre":
+                return buscarLibroNombre(buscador);
+            case "autor":
+                return buscarLibrosAutor(buscador);
+            case "genero":
+                System.out.println("buscarLibrosGenero(buscador): " + buscarLibrosGenero(buscador));
+                return buscarLibrosGenero(buscador);
+            default:
+                return mostrarLibros();
+        }
+    }
 
-    public ArrayList<Libro> buscarLibroNombre(String nombreLibro) {
-        consultaSQL = "SELECT * FROM biblioteca.libro WHERE titulo = ?";
-        ArrayList<Libro> libros = new ArrayList<>();
+    private ArrayList<HashMap> buscarLibroNombre(String nombreLibro) {
+        String SQLString = "SELECT * FROM biblioteca.libro WHERE titulo LIKE ?";
+        PreparedStatement ps;
+        ArrayList<HashMap> libros = new ArrayList<>();
         String nombreLibroBuscado = nombreLibro;
         try {
-            ps = cn.prepareStatement(consultaSQL);
-            ps.setString(1, nombreLibroBuscado);
-            rs = ps.executeQuery();
+            Connection cn = con.abrirConexion();
+            ps = cn.prepareStatement(SQLString);
+            ps.setString(1, "%" + nombreLibroBuscado + "%");
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 int idLibro = rs.getInt("id");
                 String tituloLibro = rs.getString("titulo");
@@ -356,11 +351,11 @@ public class PersonaDAO {
                 String isbnLibro = rs.getString("isbn");
                 String generoLibro = rs.getString("genero");
                 String fechaLibro = rs.getString("fecha_publicacion");
-                int ejemplaresLibro = rs.getInt("ejemplares");
                 int seccionLibro = rs.getInt("seccion_id");
-                Libro libro = new Libro(tituloLibro, autorLibro, isbnLibro, generoLibro, fechaLibro, ejemplaresLibro, seccionLibro);
+                int ejemplares = rs.getInt("ejemplares");
+                Libro libro = new Libro(tituloLibro, autorLibro, isbnLibro, generoLibro, fechaLibro, seccionLibro, ejemplares);
                 libro.setIdLibro(idLibro);
-                libros.add(libro);
+                libros.add(libro.toHashMap());
             }
             con.cerrarConexion();
             return libros;
@@ -369,15 +364,17 @@ public class PersonaDAO {
         }
         return null;
     }
-    
-    public ArrayList<Libro> buscarLibrosAutor(String nombreAutor) {
-        consultaSQL = "SELECT * FROM biblioteca.libro WHERE autor = ?";
-        ArrayList<Libro> libros = new ArrayList<>();
+
+    private ArrayList<HashMap> buscarLibrosAutor(String nombreAutor) {
+        String SQLString = "SELECT * FROM biblioteca.libro WHERE autor LIKE ?";
+        ArrayList<HashMap> libros = new ArrayList<>();
+        PreparedStatement ps;
         String nombreAutorBuscado = nombreAutor;
         try {
-            ps = cn.prepareStatement(consultaSQL);
-            ps.setString(1, nombreAutorBuscado);
-            rs = ps.executeQuery();
+            Connection cn = con.abrirConexion();
+            ps = cn.prepareStatement(SQLString);
+            ps.setString(1, "%" + nombreAutorBuscado + "%");
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 int idLibro = rs.getInt("id");
                 String tituloLibro = rs.getString("titulo");
@@ -385,11 +382,11 @@ public class PersonaDAO {
                 String isbnLibro = rs.getString("isbn");
                 String generoLibro = rs.getString("genero");
                 String fechaLibro = rs.getString("fecha_publicacion");
-                int ejemplaresLibro = rs.getInt("ejemplares");
                 int seccionLibro = rs.getInt("seccion_id");
-                Libro libro = new Libro(tituloLibro, autorLibro, isbnLibro, generoLibro, fechaLibro, ejemplaresLibro, seccionLibro);
+                int ejemplares = rs.getInt("ejemplares");
+                Libro libro = new Libro(tituloLibro, autorLibro, isbnLibro, generoLibro, fechaLibro, seccionLibro, ejemplares);
                 libro.setIdLibro(idLibro);
-                libros.add(libro);
+                libros.add(libro.toHashMap());
             }
             con.cerrarConexion();
             return libros;
@@ -407,15 +404,16 @@ public class PersonaDAO {
                         + "Genero: " + libroMostrado.getGenero() + "\n");
             }
      */
-    
-    public ArrayList<Libro> buscarLibrosGenero(String generoLibroBuscado) {
-        consultaSQL = "SELECT * FROM biblioteca.libro WHERE genero = ?";
-        ArrayList<Libro> libros = new ArrayList<>();
+    private ArrayList<HashMap> buscarLibrosGenero(String generoLibroBuscado) {
+        PreparedStatement ps;
+        String SQLString = "SELECT * FROM biblioteca.libro WHERE genero LIKE ?";
+        ArrayList<HashMap> libros = new ArrayList<>();
         String generoBuscado = generoLibroBuscado;
         try {
-            ps = cn.prepareStatement(consultaSQL);
-            ps.setString(1, generoBuscado);
-            rs = ps.executeQuery();
+            Connection cn = con.abrirConexion();
+            ps = cn.prepareStatement(SQLString);
+            ps.setString(1, "%" + generoBuscado + "%");
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 int idLibro = rs.getInt("id");
                 String tituloLibro = rs.getString("titulo");
@@ -423,12 +421,11 @@ public class PersonaDAO {
                 String isbnLibro = rs.getString("isbn");
                 String generoLibro = rs.getString("genero");
                 String fechaLibro = rs.getString("fecha_publicacion");
-                int ejemplaresLibro = rs.getInt("ejemplares");
                 int seccionLibro = rs.getInt("seccion_id");
-                System.out.println("ID LIBRO BUSCADO: "+idLibro);
-                Libro libro = new Libro(tituloLibro, autorLibro, isbnLibro, generoLibro, fechaLibro, ejemplaresLibro, seccionLibro);
+                int ejemplares = rs.getInt("ejemplares");
+                Libro libro = new Libro(tituloLibro, autorLibro, isbnLibro, generoLibro, fechaLibro, seccionLibro, ejemplares);
                 libro.setIdLibro(idLibro);
-                libros.add(libro);
+                libros.add(libro.toHashMap());
             }
             con.cerrarConexion();
             return libros;
@@ -446,14 +443,15 @@ public class PersonaDAO {
                         + "Genero: " + libroMostrado.getGenero() + "\n");
             }
      */
-    
     public String buscarPersona(int idPersona) {
-        consultaSQL = "SELECT * FROM biblioteca.persona WHERE id = ?";
+        PreparedStatement ps;
+        String SQLString = "SELECT * FROM biblioteca.persona WHERE id = ?";
         int idPersonaBuscada = idPersona;
         try {
-            ps = cn.prepareStatement(consultaSQL);
+            Connection cn = con.abrirConexion();
+            ps = cn.prepareStatement(SQLString);
             ps.setInt(1, idPersonaBuscada);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 int id = rs.getInt("id");
                 String nombre = rs.getString("nombre");
@@ -490,14 +488,17 @@ public class PersonaDAO {
         }
         return null;
     }
-    
+
     public User buscarUsuarioCorreo(String correo) {
-        consultaSQL = "SELECT * FROM biblioteca.persona WHERE correo = ?";
+        PreparedStatement ps;
+        String SQLString = "SELECT * FROM biblioteca.persona WHERE correo = ?";
         String correoBuscar = correo;
         try {
-            ps = cn.prepareStatement(consultaSQL);
+            Connection cn = con.abrirConexion();
+            ps = cn.prepareStatement(SQLString);
             ps.setString(1, correoBuscar);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
+            con.cerrarConexion();
             if (rs.next()) {
                 User user = new User();
                 user.setId(rs.getInt("id"));
@@ -510,21 +511,20 @@ public class PersonaDAO {
             }
         } catch (SQLException e) {
             System.out.println("Error al buscar persona: " + e);
-        } finally {
-            // Cerrar la conexión en el bloque 'finally'
-            con.cerrarConexion();
         }
         return null;
     }
 
     public Admin buscarAdminCorreo(String correo) {
         Admin admin = new Admin();
-        consultaSQL = "SELECT * FROM biblioteca.persona WHERE correo = ?";
+        PreparedStatement ps;
+        String SQLString = "SELECT * FROM biblioteca.persona WHERE correo = ?";
         String correoBuscar = correo;
         try {
-            ps = cn.prepareStatement(consultaSQL);
+            Connection cn = con.abrirConexion();
+            ps = cn.prepareStatement(SQLString);
             ps.setString(1, correoBuscar);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 admin.setId(rs.getInt("id"));
                 admin.setNombre(rs.getString("nombre"));
@@ -535,7 +535,7 @@ public class PersonaDAO {
                 admin.setContraseña(rs.getString("contraseña"));
                 return admin;
             }
-            System.out.println("Ingreso exitoso Admin: "+admin.getNombre());
+            System.out.println("Ingreso exitoso Admin: " + admin.getNombre());
             con.cerrarConexion();
 
         } catch (SQLException e) {
@@ -545,12 +545,18 @@ public class PersonaDAO {
     }
 
     public boolean validarIngresoAdmin(String correo, String contraseña) {
-        consultaSQL = "SELECT correo, contraseña FROM biblioteca.persona WHERE correo=? AND contraseña=?";
+        String SQLString = "SELECT correo, contraseña FROM biblioteca.persona WHERE correo=? AND contraseña=?";
+        PreparedStatement ps;
         try {
-            ps = cn.prepareStatement(consultaSQL);
+            Connection cn = con.abrirConexion();
+            ps = cn.prepareStatement(SQLString);
             ps.setString(1, correo);
             ps.setString(2, contraseña);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
+            con.cerrarConexion();
+            if(contraseña.equalsIgnoreCase("...")){
+                return false;
+            }
             if (rs.next()) {
                 System.out.println("Usuario: " + correo + " encontrado correctamente");
                 return true;
@@ -558,33 +564,58 @@ public class PersonaDAO {
                 System.out.println("No se ha encontrado el usuario: " + correo);
                 return false;
             }
+
         } catch (SQLException e) {
             System.out.println("Error al validar ingreso: " + e);
         }
-        con.cerrarConexion();
+
         return false;
     }
 
     public boolean validarIngresoUser(String correo) {
-        consultaSQL = "SELECT correo, contraseña FROM biblioteca.persona WHERE correo=? AND contraseña=?";
+        PreparedStatement ps;
+        String SQLString = "SELECT correo, contraseña FROM biblioteca.persona WHERE correo=? AND contraseña=?";
         try {
-            ps = cn.prepareStatement(consultaSQL);
+            Connection cn = con.abrirConexion();
+            ps = cn.prepareStatement(SQLString);
             ps.setString(1, correo);
             ps.setString(2, "null");
-            rs = ps.executeQuery();
-            if (rs.next()) {
+            ResultSet rs = ps.executeQuery();
+            boolean result = rs.next();
+            if (result) {
                 System.out.println("Usuario: " + correo + " encontrado correctamente");
-                return true;
-            } else {
-                System.out.println("No se ha encontrado el usuario: " + correo);
-                return false;
             }
+            con.cerrarConexion();
+            return result;
         } catch (SQLException e) {
             System.out.println("Error al validar ingreso: " + e);
+            return false;
         }
-        con.cerrarConexion();
-        return false;
     }
-    
+
+    private void aumentarEjemplares(int idLibro) throws SQLException {
+        String SQLString = "UPDATE libro SET ejemplares = ejemplares + 1 WHERE id = ?";
+        Connection cn = con.abrirConexion();
+        PreparedStatement ps = cn.prepareStatement(SQLString);
+        ps.setInt(1, idLibro);
+        ps.executeUpdate();
+        con.cerrarConexion();
+    }
+
+    public void devolverLibro(int prestamoId, int idLibro) {
+        PreparedStatement ps;
+        String SQLString = "UPDATE prestamo SET devuelto=true WHERE id=?";
+        try {
+            Connection cn = con.abrirConexion();
+            ps = cn.prepareStatement(SQLString);
+            ps.setInt(1, prestamoId);
+            ps.executeUpdate();
+            con.cerrarConexion();
+
+            aumentarEjemplares(idLibro);
+        } catch (SQLException e) {
+            System.out.println("Error al devoler libro: " + e);
+        }
+    }
 
 }

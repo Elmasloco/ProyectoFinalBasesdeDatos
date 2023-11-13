@@ -18,28 +18,20 @@ public class Libro {
     private String isbn;
     private String genero;
     private String fecha_publicacion;
-    private int ejemplares;
     private int seccion_id;
+    private int ejemplares;
 
     public Libro() {
     }
 
-    public Libro(String titulo, String autor, String isbn, String genero, String fecha_publicacion, int ejemplares, int seccion_id) {
+    public Libro(String titulo, String autor, String isbn, String genero, String fecha_publicacion, int seccion_id, int ejemplares) {
         this.titulo = titulo;
         this.autor = autor;
         this.isbn = isbn;
         this.genero = genero;
         this.fecha_publicacion = fecha_publicacion;
+        this.seccion_id = seccion_id;
         this.ejemplares = ejemplares;
-        this.seccion_id = seccion_id;
-    }
-
-    public int getSeccion_id() {
-        return seccion_id;
-    }
-
-    public void setSeccion_id(int seccion_id) {
-        this.seccion_id = seccion_id;
     }
 
     public int getEjemplares() {
@@ -48,6 +40,14 @@ public class Libro {
 
     public void setEjemplares(int ejemplares) {
         this.ejemplares = ejemplares;
+    }
+
+    public int getSeccion_id() {
+        return seccion_id;
+    }
+
+    public void setSeccion_id(int seccion_id) {
+        this.seccion_id = seccion_id;
     }
 
     public String getTitulo() {
@@ -106,8 +106,8 @@ public class Libro {
         libro.put("isbn", this.isbn);
         libro.put("genero", this.genero);
         libro.put("fecha_publicacion", this.fecha_publicacion);
-        libro.put("ejemplares", this.ejemplares);
         libro.put("seccion_id", this.seccion_id);
+        libro.put("ejemplares", this.ejemplares);
         return libro;
     }
     
